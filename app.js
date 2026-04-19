@@ -23,7 +23,7 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
-// ✅ Use Atlas DB (important for deployment)
+// ✅ Use Atlas DB
 const dbURL = process.env.ATLASDB_URL;
 
 // Connect to DB
@@ -45,7 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "/public")));
 
-// Session store (MongoDB)
+// Session store
 const store = MongoStore.create({
   mongoUrl: dbURL,
   crypto: {
@@ -54,7 +54,6 @@ const store = MongoStore.create({
   touchAfter: 24 * 3600,
 });
 
-// Fix error handler bug
 store.on("error", (err) => {
   console.log("ERROR in MONGO SESSION STORE", err);
 });
@@ -76,7 +75,7 @@ const sessionOptions = {
 app.use(session(sessionOptions));
 app.use(flash());
 
-// Passport setup
+// Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -92,12 +91,17 @@ app.use((req, res, next) => {
   next();
 });
 
+// ✅ ROOT ROUTE FIX
+app.get("/", (req, res) => {
+  res.redirect("/listings");
+});
+
 // Routes
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
-// ✅ Handle multer file type error FIRST
+// Multer error handler
 app.use((err, req, res, next) => {
   if (err.message === "Only images are allowed") {
     req.flash("error", err.message);
@@ -112,7 +116,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("listings/error.ejs", { message });
 });
 
-// Dynamic port for deployment
+// Port
 const port = process.env.PORT || 8080;
 
 app.listen(port, () => {
