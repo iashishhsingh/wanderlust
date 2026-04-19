@@ -1,6 +1,4 @@
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
+require("dotenv").config();
 
 const express = require("express");
 const app = express();
@@ -8,46 +6,41 @@ const mongoose = require("mongoose");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
-const ExpressError = require("./utils/ExpressError");
-
+const ExpressError = require("./utils/ExpressError.js");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
+const cookieParser = require("cookie-parser");
 const flash = require("connect-flash");
-
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
 
-// Routes
-const listingRouter = require("./routes/listing.js");
-const reviewRouter = require("./routes/review.js");
-const userRouter = require("./routes/user.js");
+const listingsRoute = require("./routes/listing.js");
+const reviewsRoute = require("./routes/review.js");
+const userRoute = require("./routes/user.js");
 
-// ✅ Use Atlas DB
-const dbURL = process.env.ATLASDB_URL;
-
-// Connect to DB
-async function main() {
-  await mongoose.connect(dbURL);
-}
-
-main()
-  .then(() => console.log("connected to DB"))
-  .catch((err) => console.log(err));
-
-// View engine setup
+app.engine("ejs", ejsMate);
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-app.engine("ejs", ejsMate);
-
-// Middleware
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(methodOverride("_method"));
 app.use(express.static(path.join(__dirname, "/public")));
 
-// Session store
+const MONGO_URL = process.env.ATLASDB;
+
+async function main() {
+  await mongoose.connect(MONGO_URL);
+}
+
+main()
+  .then(() => {
+    console.log("DB connected");
+  })
+  .catch((err) => console.log(err));
+
 const store = MongoStore.create({
-  mongoUrl: dbURL,
+  mongoUrl: MONGO_URL,
   crypto: {
     secret: process.env.SECRET,
   },
@@ -55,70 +48,78 @@ const store = MongoStore.create({
 });
 
 store.on("error", (err) => {
-  console.log("ERROR in MONGO SESSION STORE", err);
+  console.log("Error in mongosession store", err);
 });
 
-// Session config
-const sessionOptions = {
+const sessionOption = {
   store,
   secret: process.env.SECRET,
   resave: false,
-  saveUninitialized: false,
+  saveUninitialized: true,
   cookie: {
-    expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    expires: Date.now() + 7 * 24 * 60 * 60 + 1000,
+    maxAge: 7 * 24 * 60 * 60 + 1000,
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
   },
 };
 
-app.use(session(sessionOptions));
+app.use(session(sessionOption));
+app.use(cookieParser("secretcode"));
 app.use(flash());
 
-// Passport
+//  to use passpport for every req
 app.use(passport.initialize());
+// to maintain the user infor in seesion
 app.use(passport.session());
-
+// use  authenticate method of model in LocalStrategy
 passport.use(new LocalStrategy(User.authenticate()));
+
+// use static serialize and deserialize of model for passport session support
+// to store and unstore user data in session
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// Flash + user middleware (SAFE FIX)
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
-  res.locals.currUser = req.user || null;
+  res.locals.currUser = req.user;
   next();
 });
 
-
+// ROOT Route
 app.get("/", (req, res) => {
+  // res.send("This is root page");
   res.redirect("/listings");
 });
 
-// Routes (FIXED ORDER)
-app.use("/listings", listingRouter);
-app.use("/listings/:id/reviews", reviewRouter);
-app.use("/users", userRouter); // 
+app.get("/demouser", async (req, res) => {
+  let fakeUser = new User({
+    email: "fake@gmail.com",
+    username: "faketest",
+  });
 
-// Multer error handler
-app.use((err, req, res, next) => {
-  if (err.message === "Only images are allowed") {
-    req.flash("error", err.message);
-    return res.redirect("back");
-  }
-  next(err);
+  let registeredUser = await User.register(fakeUser, "hellouser");
+  res.send(registeredUser);
 });
 
-// Global error handler
+// for lisitngs
+app.use("/listings", listingsRoute);
+app.use("/listings/:id/reviews", reviewsRoute);
+app.use("/", userRoute);
+
+app.use((req, res, next) => {
+  // throw new ExpressError(404,"Page not Found");
+  next(new ExpressError(404, "Page not Found!"));
+});
+
 app.use((err, req, res, next) => {
-  let { statusCode = 500, message = "Something went wrong!" } = err;
+  if (res.headersSent) {
+    return next(err); // 🔥 important
+  }
+  let { statusCode = 500, message = "Something Went Wrong!" } = err;
   res.status(statusCode).render("listings/error.ejs", { message });
 });
 
-// Port (Render uses dynamic port)
-const port = process.env.PORT || 8080;
-
-app.listen(port, () => {
-  console.log(`server is listening on port ${port}`);
+app.listen(8080, () => {
+  console.log("Server is running on 8080");
 });

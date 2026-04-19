@@ -1,32 +1,30 @@
 const express = require("express");
-const router = express.Router({ mergeParams: true });
+const router = express.Router({mergeParams:true});
 const wrapAsync = require("../utils/wrapAsync.js");
-const Review = require("../models/review.js");
-const Listing = require("../models/listing.js");
-const {
-  validateReview,
-  isLoggedIn,
-  isReviewAuthor,
-} = require("../middleware/middleware.js");
+const ExpressError = require("../utils/ExpressError.js");
+const Review = require("../models/reviews.js");
+const Listing=require('../models/listing.js');
+const {validateReview, isLoggedIn, isReviewOwner} = require("../middleware.js");
 
-const reviewController = require("../controllers/reviews.js");
+const reviewController = require('../controllers/reviews.js');
 
-// Reviews
-// Post Route
+// reviews
+// post review route
 router.post(
   "/",
-  isLoggedIn,
+  isLoggedIn, 
   validateReview,
-  wrapAsync(reviewController.createReview)
+  wrapAsync(reviewController.addReview),
 );
 
-// Delete Review Route
+// delete review route
 
 router.delete(
   "/:reviewId",
   isLoggedIn,
-  isReviewAuthor,
-  wrapAsync(reviewController.deleteReview)
+  isReviewOwner,
+  wrapAsync(reviewController.deleteReview),
 );
+
 
 module.exports = router;
