@@ -91,9 +91,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ ROOT ROUTE FIX
+// ✅ ROOT ROUTE
 app.get("/", (req, res) => {
-  res.redirect("/listings");
+  res.render("home.ejs");
 });
 
 // Routes
