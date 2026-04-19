@@ -1,11 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
-const Listing = require("../models/listing.js");
-const { isLoggedIn, isOwner, validateListing } = require("../middleware/middleware.js");
+
+const {
+  isLoggedIn,
+  isOwner,
+  validateListing,
+} = require("../middleware/middleware.js");
 const listingController = require("../controllers/listings.js");
 const upload = require("../middleware/upload");
 
+// INDEX + CREATE
 router
   .route("/")
   .get(wrapAsync(listingController.index))
@@ -13,12 +18,13 @@ router
     isLoggedIn,
     upload.single("listing[image]"),
     validateListing,
-    wrapAsync(listingController.createListing)
+    wrapAsync(listingController.createListing),
   );
 
-// New route
+// NEW (must come BEFORE :id routes)
 router.get("/new", isLoggedIn, listingController.renderNewForm);
 
+// SHOW + UPDATE + DELETE
 router
   .route("/:id")
   .get(wrapAsync(listingController.showListing))
@@ -27,16 +33,16 @@ router
     isOwner,
     upload.single("listing[image]"),
     validateListing,
-    wrapAsync(listingController.updateListing)
+    wrapAsync(listingController.updateListing),
   )
   .delete(isLoggedIn, isOwner, wrapAsync(listingController.deleteListing));
 
-// Edit Route
+// EDIT
 router.get(
   "/:id/edit",
   isLoggedIn,
   isOwner,
-  wrapAsync(listingController.renderEditForm)
+  wrapAsync(listingController.renderEditForm),
 );
 
 module.exports = router;
