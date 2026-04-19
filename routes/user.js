@@ -13,17 +13,14 @@ router
   .post(wrapAsync(userController.signup));
 
 // LOGIN
-router
-  .route("/login")
-  .get(userController.renderLoginForm)
-  .post(
-    saveRedirectUrl, // ✅ must be here
-    passport.authenticate("local", {
-      failureRedirect: "/users/login",
-      failureFlash: true,
-    }),
-    userController.login // ✅ no comma here
-  );
+router.post(
+  "/login",
+  passport.authenticate("local", {
+    failureRedirect: "/users/login",
+    failureFlash: true,
+  }),
+  userController.login,
+);
 
 // LOGOUT
 router.get("/logout", userController.logout);

@@ -58,6 +58,8 @@ store.on("error", (err) => {
   console.log("ERROR in MONGO SESSION STORE", err);
 });
 
+app.set("trust proxy", 1);
+
 // Session config
 const sessionOptions = {
   store,
@@ -68,7 +70,7 @@ const sessionOptions = {
     expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: false, 
   },
 };
 
@@ -91,15 +93,14 @@ app.use((req, res, next) => {
   next();
 });
 
-
 app.get("/", (req, res) => {
-  res.render("home"); 
+  res.render("home");
 });
 
 // Routes (FIXED ORDER)
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
-app.use("/users", userRouter); // 
+app.use("/users", userRouter); //
 
 // Multer error handler
 app.use((err, req, res, next) => {
