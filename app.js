@@ -110,6 +110,14 @@ app.use((err, req, res, next) => {
   // res.status(statusCode).send(message);
 });
 
+app.use((err, req, res, next) => {
+  if (err.message === "Only images are allowed") {
+    req.flash("error", err.message);
+    return res.redirect("back");
+  }
+  next(err);
+});
+
 app.listen(8080, () => {
   console.log("server is listening to port 8080");
 });

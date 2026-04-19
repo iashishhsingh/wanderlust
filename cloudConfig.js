@@ -7,16 +7,15 @@ cloudinary.config({
   api_secret: process.env.CLOUD_API_SECRET,
 });
 
-
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
+  cloudinary,
   params: {
-    folder: 'wanderlust_DEV',
-    allowedFormat: ['png','jpg', 'jpeg'],
+    folder: "wanderlust",
+    allowedFormats: ["png", "jpg", "jpeg"],
   },
 });
 
 module.exports = {
-    cloudinary,
-    storage,
-}
+  cloudinary,
+  storage,
+};
