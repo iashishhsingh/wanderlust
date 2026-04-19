@@ -93,7 +93,7 @@ app.use((req, res, next) => {
 
 // ✅ ROOT ROUTE
 app.get("/", (req, res) => {
-  res.render("home.ejs");
+  res.send("Server is working fine");
 });
 
 // Routes
