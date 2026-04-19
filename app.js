@@ -83,7 +83,7 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-// Flash + user middleware
+// Flash + user middleware (SAFE FIX)
 app.use((req, res, next) => {
   res.locals.success = req.flash("success");
   res.locals.error = req.flash("error");
@@ -91,15 +91,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// ROOT ROUTE
+// ✅ ROOT ROUTE (FIXED)
 app.get("/", (req, res) => {
   res.redirect("/listings");
 });
 
-// Routes
+// Routes (FIXED ORDER)
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
-app.use("/users", userRouter);   
+app.use("/users", userRouter); // 
 
 // Multer error handler
 app.use((err, req, res, next) => {
@@ -116,7 +116,7 @@ app.use((err, req, res, next) => {
   res.status(statusCode).render("listings/error.ejs", { message });
 });
 
-// Port
+// Port (Render uses dynamic port)
 const port = process.env.PORT || 8080;
 
 app.listen(port, () => {
