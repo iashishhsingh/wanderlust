@@ -91,15 +91,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ ROOT ROUTE
+// ROOT ROUTE
 app.get("/", (req, res) => {
-  res.send("Server is working fine");
+  res.redirect("/listings");
 });
 
 // Routes
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
-app.use("/", userRouter);
+app.use("/users", userRouter);   
 
 // Multer error handler
 app.use((err, req, res, next) => {
