@@ -41,4 +41,4 @@ SECRET=
 ![Login](screenshots/login.png)
 
 ## 🌐 Live Demo
-(Add after deployment)
+https://wanderlust-4zwe.onrender.com
