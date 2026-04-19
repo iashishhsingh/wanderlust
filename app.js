@@ -93,7 +93,7 @@ app.use((req, res, next) => {
 
 // ✅ ROOT ROUTE (FIXED)
 app.get("/", (req, res) => {
-  res.redirect("/listings");
+  res.send("NEW DEPLOY CHECK");
 });
 
 // Routes (FIXED ORDER)
