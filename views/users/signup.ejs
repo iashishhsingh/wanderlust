@@ -1,28 +1,58 @@
-<% layout("/layouts/boilerplate") -%>
+<% layout("/layouts/boilerplate.ejs") %>
+<!-- <body style="background-image: url('https://plus.unsplash.com/premium_photo-1684508638760-72ad80c0055f?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+             background-size: cover;
+             background-position: center;
+             background-repeat: no-repeat;
+             margin: 0;
+             height: 100vh;">
+   
+</body> -->
 
-<body>
-        <div class="row mt-4 ">
-            <div class="col-6 offset-3">
-                 <form action="/signup" method="post" novalidate class="needs-validation">
-                        <h2>SignUp for Wanderlust</h2>
-                        <br>
-                        <div class="mb-3" >
-                            <label for="username" class="form-label">Username : </label>
-                            <input type="text" id="username" name="username" placeholder="Enter username"  class="form-control" required>
-                            <div class="valid-feedback">Looks good!</div>
-                        </div>
 
-                        <div class="mb-3" >
-                            <label for="email" class="form-label">Email : </label>
-                            <input type="email" id="email" name="email" placeholder="Enter email"  class="form-control" required>
-                        </div>
-                
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password : </label>
-                            <input type="password" name="password" id="password" placeholder="Enter password"  class="form-control" required>
-                        </div>
-                        <button class="btn btn-success mt-2">SignUp</button>            
-                    
-            </div>
-        </div>
-        
+<div class="row mt-3">
+  <h1 class="signup-heading col-6 offset-4">SignUp on Wanderlust</h1>
+  <div class="col-6 offset-3">
+    <form action="/signup" method="POST" class="needs-validation" novalidate>
+      <!-- for username -->
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input
+          type="text"
+          name="username"
+          id="username"
+          class="form-control"
+          required
+        />
+        <div class="valid-feedback">Looks good!</div>
+        <div class="invalid-feedback">Enter username!</div>
+      </div>
+
+      <!-- for email -->
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          name="email"
+          id="email"
+          class="form-control"
+          required
+        />
+        <div class="invalid-feedback">Enter email!</div>
+      </div>
+
+      <!-- for password -->
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          name="password"
+          id="password"
+          class="form-control"
+          required
+        />
+        <div class="invalid-feedback">Enter password!</div>
+      </div>
+      <button class="btn btn-primary col-2 signup-btn">Signup</button>
+    </form>
+  </div>
+</div>

@@ -189,7 +189,7 @@ const sampleListings = [
     },
     price: 1500,
     location: "Banff",
-    country: "Canada",
+    country: "Canada",  
   },
   {
     title: "Art Deco Apartment in Miami",
